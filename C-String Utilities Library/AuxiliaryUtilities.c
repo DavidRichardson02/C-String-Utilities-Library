@@ -70,6 +70,206 @@ const char *commonDateTimeFormats[12] =
 
 
 
+int *allocate_memory_int_ptr(size_t sizeI)
+{
+	int *intPtr = (int*)malloc(sizeI * sizeof(int));
+	if (intPtr == NULL)
+	{
+		perror("\n\nError: Unable to allocate memory in 'allocate_memory_int_ptr'.\n");
+		exit(1);
+	}
+	
+	return intPtr;
+}
+
+
+float *allocate_memory_float_ptr(size_t sizeF)
+{
+	float *floatPtr = (float*)malloc(sizeF * sizeof(float));
+	if (floatPtr == NULL)
+	{
+		perror("\n\nError: Unable to allocate memory in 'allocate_memory_float_ptr'.\n");
+		exit(1);
+	}
+	
+	return floatPtr;
+}
+
+
+double *allocate_memory_double_ptr(size_t sizeD)
+{
+	double *doublePtr = (double*)malloc(sizeD * sizeof(double));
+	if (doublePtr == NULL)
+	{
+		perror("\n\nError: Unable to allocate memory in 'allocate_memory_double_ptr'.\n");
+		exit(1);
+	}
+	
+	return doublePtr;
+}
+
+
+char *allocate_memory_char_ptr(size_t sizeC)
+{
+	char *charPtr = (char*)malloc(sizeC * sizeof(char));
+	if (charPtr == NULL)
+	{
+		perror("\n\nError: Unable to allocate memory in 'allocate_memory_char_ptr'.\n");
+		exit(1);
+	}
+	
+	return charPtr;
+}
+
+
+
+
+int **allocate_memory_int_ptr_ptr(size_t sizeI)
+{
+	int **intPtrPtr = (int**)malloc(sizeI * sizeof(int*));
+	if (intPtrPtr == NULL)
+	{
+		perror("\n\nError: Unable to allocate memory in 'allocate_memory_int_ptr_ptr'.\n");
+		exit(1);
+	}
+	
+	
+	//For each pointer, allocate memory for a float pointer
+	for(size_t i = 0; i < sizeI; i++)
+	{
+		intPtrPtr[i] = allocate_memory_int_ptr(sizeof(intPtrPtr[i]));
+	}
+	
+	return intPtrPtr;
+}
+
+
+float **allocate_memory_float_ptr_ptr(size_t sizeF)
+{
+	float **floatPtrPtr = (float**)malloc(sizeF * sizeof(float*));
+	if (floatPtrPtr == NULL)
+	{
+		perror("\n\nError: Unable to allocate memory in 'allocate_memory_float_ptr_ptr'.\n");
+		exit(1);
+	}
+	
+	
+	//For each pointer, allocate memory for a float pointer
+	for(size_t i = 0; i < sizeF; i++)
+	{
+		floatPtrPtr[i] = allocate_memory_float_ptr(sizeof(floatPtrPtr[i]));
+	}
+	
+	return floatPtrPtr;
+}
+
+
+double **allocate_memory_double_ptr_ptr(size_t sizeD)
+{
+	double **doublePtrPtr = (double**)malloc(sizeD * sizeof(double*));
+	if (doublePtrPtr == NULL)
+	{
+		perror("\n\nError: Unable to allocate memory in 'allocate_memory_double_ptr_ptr'.\n");
+		exit(1);
+	}
+	
+	
+	//For each pointer, allocate memory for a double pointer
+	for(size_t i = 0; i < sizeD; i++)
+	{
+		doublePtrPtr[i] = allocate_memory_double_ptr(sizeof(doublePtrPtr[i]));
+	}
+	
+	return doublePtrPtr;
+}
+
+
+char **allocate_memory_char_ptr_ptr(size_t strSize, size_t numStrings) // Allocate memory for the array of char* pointers
+{
+	char **charPtrPtr = (char**)malloc(numStrings * sizeof(char*));
+	if (charPtrPtr == NULL)
+	{
+		perror("\n\nError: Unable to allocate memory in 'allocate_memory_char_ptr_ptr'.\n");
+		exit(1);
+	}
+	
+	
+	//For each pointer, allocate memory for a char pointer
+	for(size_t i = 0; i < numStrings; i++)
+	{
+		charPtrPtr[i] = allocate_memory_char_ptr(strSize);
+	}
+	
+	return charPtrPtr;
+}
+
+
+
+
+void deallocate_memory_int_ptr_ptr(int **intPtrPtr, size_t numInts)
+{
+	if (intPtrPtr != NULL)
+	{
+		// First, free each element
+		for (size_t i = 0; i < numInts; i++)
+		{
+			free(intPtrPtr[i]);
+		}
+		// Then, free the array of pointers
+		free(intPtrPtr);
+	}
+}
+
+
+void deallocate_memory_float_ptr_ptr(float **floatPtrPtr, size_t numFloats)
+{
+	if (floatPtrPtr != NULL)
+	{
+		// First, free each element
+		for (size_t i = 0; i < numFloats; i++)
+		{
+			free(floatPtrPtr[i]);
+		}
+		// Then, free the array of pointers
+		free(floatPtrPtr);
+	}
+}
+
+
+void deallocate_memory_double_ptr_ptr(double **doublePtrPtr, size_t numDoubles)
+{
+	if (doublePtrPtr != NULL)
+	{
+		// First, free each element
+		for (size_t i = 0; i < numDoubles; i++)
+		{
+			free(doublePtrPtr[i]);
+		}
+		// Then, free the array of pointers
+		free(doublePtrPtr);
+	}
+}
+
+
+void deallocate_memory_char_ptr_ptr(char **charPtrPtr, size_t numStrings)
+{
+	if (charPtrPtr != NULL)
+	{
+		// First, free each string
+		for (size_t i = 0; i < numStrings; i++)
+		{
+			free(charPtrPtr[i]);
+		}
+		// Then, free the array of pointers
+		free(charPtrPtr);
+	}
+}
+
+
+
+
+
+
 /**
  * min
  * Calculates the minimum of two double values.
