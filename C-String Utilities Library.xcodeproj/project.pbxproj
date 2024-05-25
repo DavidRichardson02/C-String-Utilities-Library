@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		E03A8DFE2C01FD28007672C8 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = E03A8DFD2C01FD28007672C8 /* main.c */; };
+		E03A8E092C01FD97007672C8 /* StringUtilities.c in Sources */ = {isa = PBXBuildFile; fileRef = E03A8E082C01FD97007672C8 /* StringUtilities.c */; };
+		E03A8E0C2C020277007672C8 /* AuxiliaryUtilities.c in Sources */ = {isa = PBXBuildFile; fileRef = E03A8E0B2C020277007672C8 /* AuxiliaryUtilities.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,6 +27,10 @@
 /* Begin PBXFileReference section */
 		E03A8DFA2C01FD28007672C8 /* C-String Utilities Library */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "C-String Utilities Library"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E03A8DFD2C01FD28007672C8 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		E03A8E072C01FD97007672C8 /* StringUtilities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StringUtilities.h; sourceTree = "<group>"; };
+		E03A8E082C01FD97007672C8 /* StringUtilities.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = StringUtilities.c; sourceTree = "<group>"; };
+		E03A8E0A2C020277007672C8 /* AuxiliaryUtilities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AuxiliaryUtilities.h; sourceTree = "<group>"; };
+		E03A8E0B2C020277007672C8 /* AuxiliaryUtilities.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = AuxiliaryUtilities.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +64,10 @@
 			isa = PBXGroup;
 			children = (
 				E03A8DFD2C01FD28007672C8 /* main.c */,
+				E03A8E072C01FD97007672C8 /* StringUtilities.h */,
+				E03A8E082C01FD97007672C8 /* StringUtilities.c */,
+				E03A8E0A2C020277007672C8 /* AuxiliaryUtilities.h */,
+				E03A8E0B2C020277007672C8 /* AuxiliaryUtilities.c */,
 			);
 			path = "C-String Utilities Library";
 			sourceTree = "<group>";
@@ -120,6 +130,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				E03A8DFE2C01FD28007672C8 /* main.c in Sources */,
+				E03A8E0C2C020277007672C8 /* AuxiliaryUtilities.c in Sources */,
+				E03A8E092C01FD97007672C8 /* StringUtilities.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
