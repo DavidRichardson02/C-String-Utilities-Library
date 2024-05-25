@@ -1,7 +1,10 @@
 # C-String Utilities Library
 
 ## Overview
-The C-String Utilities Library provides a comprehensive suite of utilities for string manipulation and analysis, as well as auxiliary functions for various computational tasks. This library is designed to aid in data parsing, preprocessing, and various computational tasks that involve strings and memory operations.
+The C-String Utilities Library provides a comprehensive suite of utilities for string manipulation and analysis, as well as auxiliary functions and definitions for performing various computational tasks 
+This library is designed to aid in data parsing, preprocessing, and various computational tasks that involve strings and/or memory operations.
+The library is focused on providing functions for handling C-style strings, namely: char, char*, char*[], and char**.
+
 
 ## Table of Contents
 - [Files](#files)
@@ -11,13 +14,15 @@ The C-String Utilities Library provides a comprehensive suite of utilities for s
   - [Auxiliary Utilities](#auxiliary-utilities)
   - [String Utilities](#string-utilities)
 - [Contributing](#contributing)
-- [License](#license)
+
+
+
 
 ## Files
 
-1. **AuxiliaryUtilities.h** - Header file for auxiliary utilities.
+1. **AuxiliaryUtilities.h** - Header file for auxiliary utilities, declares functions for general utility purposes, including memory operations, time conversions, and bitwise operations, additionally, this file also defines the global constants used throughout the program.
 2. **AuxiliaryUtilities.c** - Implementation file for auxiliary utilities.
-3. **StringUtilities.h** - Header file for string utilities.
+3. **StringUtilities.h** - Header file for string utilities, declares functions for string manipulation and analysis.
 4. **StringUtilities.c** - Implementation file for string utilities.
 
 ## Installation
@@ -30,8 +35,7 @@ gcc -o my_program my_program.c AuxiliaryUtilities.c StringUtilities.c -lpthread
 ```
 
 ## Usage
-
-Include the necessary headers in your source files:
+To use the library, include the header files in your C source files:
 ```c
 #include "AuxiliaryUtilities.h"
 #include "StringUtilities.h"
@@ -78,15 +82,15 @@ Include the necessary headers in your source files:
 
 #### String Properties
 - `bool string_is_numeric(const char *characterString)` - Checks if a string represents a numeric value.
-- `int *string_is_date_time(const char *characterString, const char *delimiter, const int fieldCount)` - Analyzes a string for date/time formats.
+- `int *string_is_date_time(const char *characterString, const char *delimiter, const int fieldCount)` - Analyzes a string to detect occurences of commonly used date/time formats(defined in AuxiliaryUtilities.h).
 - `bool string_array_contains_date_time(char **stringArray, int stringCount, const char *delimiter)` - Checks if any string in an array contains a date/time format.
 
 #### Counting and Identifying
 - `int count_character_occurrences(const char *characterString, char c)` - Counts occurrences of a character in a string.
 - `char find_most_common_non_alphanumeric_character(const char *characterString)` - Finds the most common non-alphanumeric character in a string.
 - `char *find_potential_delimiters(const char *characterString, int *delimiterCount)` - Finds potential delimiters in a string.
-- `char *identify_delimiter(char **stringArray, int stringCount)` - Identifies the most common delimiter in an array of strings.
-- `const char *determine_string_representation_type(const char *token)` - Determines if a string is numeric or non-numeric.
+- `char *identify_delimiter(char **stringArray, int stringCount)` - Identifies the most common delimiter across an array of strings.
+- `const char *determine_string_representation_type(const char *token)` - Determines if a string is numeric or non-numeric, FYI this function was made with the intention of passing in delimited data fields and individually assessing their type.
 
 #### String Manipulation
 - `size_t character_string_length(const char *characterString)` - Returns the length of a character string.
@@ -120,9 +124,6 @@ Include the necessary headers in your source files:
 - `void print_char_ptr_array(char *charPtrArr[], int stringCount, char *label)` - Prints an array of char pointers.
 
 ## Contributing
+Contributions to the C-String Utilities Library are welcome. If you have any bug reports, feature requests, or improvements, please open an issue or submit a pull request on GitHub.
 
-Contributions are welcome! Please fork the repository, make your changes, and submit a pull request. Ensure your code follows the project's coding standards and is well-documented.
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
