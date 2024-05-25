@@ -20,7 +20,7 @@ The library is focused on providing functions for handling C-style strings, name
 
 ## Files
 
-1. **AuxiliaryUtilities.h** - Header file for auxiliary utilities, declares functions for general utility purposes, including memory operations, time conversions, and bitwise operations, additionally, this file also defines the global constants used throughout the program.
+1. **AuxiliaryUtilities.h** - Header file for auxiliary utilities, declares functions and global constants for general utility purposes.
 2. **AuxiliaryUtilities.c** - Implementation file for auxiliary utilities.
 3. **StringUtilities.h** - Header file for string utilities, declares functions for string manipulation and analysis.
 4. **StringUtilities.c** - Implementation file for string utilities.
