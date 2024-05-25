@@ -66,6 +66,35 @@ static pthread_mutex_t localtime_mutex = PTHREAD_MUTEX_INITIALIZER; //Mutex for 
 
 
 
+// ------------- Helper Functions for Allocating Memory Safely For Basic Types -------------
+/// \{
+int *allocate_memory_int_ptr(size_t sizeI);
+float *allocate_memory_float_ptr(size_t sizeF);
+double *allocate_memory_double_ptr(size_t sizeD);
+char *allocate_memory_char_ptr(size_t sizeC);
+/// \}
+
+
+
+
+// ------------- Helper Functions for Allocating and Deallocating Memory Safely For Derived Types -------------
+/// \{
+int **allocate_memory_int_ptr_ptr(size_t sizeI);
+float **allocate_memory_float_ptr_ptr(size_t sizeF);
+double **allocate_memory_double_ptr_ptr(size_t sizeD);
+char **allocate_memory_char_ptr_ptr(size_t strSize, size_t numStrings);
+
+void deallocate_memory_int_ptr_ptr(int **intPtrPtr, size_t numInts);
+void deallocate_memory_float_ptr_ptr(float **floatPtrPtr, size_t numFloats);
+void deallocate_memory_double_ptr_ptr(double **doublePtrPtr, size_t numDoubles);
+void deallocate_memory_char_ptr_ptr(char **charPtrPtr, size_t numStrings);
+/// \}
+
+
+
+
+
+
 // ------------- Helper Functions for Performing Various Mathematical Operations on Containers -------------
 /// \{
 double min(double a, double b); // Returns the minimum of two values.
