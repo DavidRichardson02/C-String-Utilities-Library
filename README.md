@@ -62,95 +62,7 @@ To install the C-String Utilities Library for use in your project, follow these 
 
 ## Functions
 
-### Auxiliary Utilities
-The `AuxiliaryUtilities.h` file includes several useful constants and macros designed to simplify common programming tasks and enhance code readability. Here are some of the key elements:
 
-#### Global Constants
-
-1. **MAX_STRING_SIZE**
-    - `static const size_t MAX_STRING_SIZE = 1000;` - Defines the maximum string size that can be handled by the utility functions, useful for setting buffer sizes and ensuring consistent memory allocation across different string operations.
-
-2. **months**
-    - `extern const char *months[12];` - Contains the names of the twelve months of the year, useful for converting numeric month representations into their corresponding textual names.
-
-3. **weekDays**
-    - `extern const char *weekDays[7];` - Holds the names of the seven days of the week, useful for mapping numeric day representations to their corresponding day names.
-
-4. **commonDateTimeFormats**
-    - `extern const char *commonDateTimeFormats[12];` - Contains string literals representing commonly used date/time formats, crucial for parsing and standardizing date/time strings from various data sources.
-
-#### Macros
-
-1. **ARRAY_SIZE**
-    - `#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))` - Computes the number of elements in a statically-allocated array, useful for determining the size of an array at compile time.
-
-2. **VAR_NAME_AS_STRING**
-    - `#define VAR_NAME_AS_STRING(var) #var` - Creates a string representation of its argument, useful for debugging and logging purposes.
-
-#### Mutex for Thread Safety
-
-The file also defines a mutex for thread safety when accessing local time functions:
-- `static pthread_mutex_t localtime_mutex = PTHREAD_MUTEX_INITIALIZER` - This mutex ensures that access to the `localtime` function is thread-safe, preventing potential data races in multi-threaded applications.
-
-
-
-
-
-
-<br/>
-<br/>  
-<br/>
-
-### General Utilities
-
-
-#### Time Operations
-Conversion between date/time strings and Unix time, thread-safe localtime conversion.
-- `time_t convert_to_unix_time(const char *dateTimeString)` - Converts a date/time string into Unix time.
-- `struct tm *thread_safe_localtime(const time_t *tim, struct tm *result)` - A thread-safe wrapper around localtime.
-<br/>
-
-
-  
-
-
-#### Bitwise Operations
-- `uint64_t flip_sign_bit(uint64_t value)` - Flips the sign bit of a 64-bit integer.
-- `uint64_t double_to_uint64(double value)` - Reinterprets a double as a uint64_t.
-- `double uint64_to_double(uint64_t value)` - Reinterprets a uint64_t as a double.
-<br/>
-
-
-  
-
-#### Sorting
-- `void merge_sort(double *unsortedData, const int numElements)` - Sorts an array of doubles using the merge sort algorithm.
-- `void radix_sort_doubles(double *unsortedData, const int numElements)` - Sorts an array of doubles using radix sort.
-<br/>
-
-
-  
-
-#### Memory Operations
-- `void *set_memory_block(void *block, int c, size_t n)` - Sets the first `n` bytes of the memory block to the value specified by `c`.
-- `void *copy_memory_block(void *destination, const void *source, size_t n)` - Copies `n` bytes from source to destination.
-<br/>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<br/>
-<br/>
-<br/>
 
 ### String Utilities
   
@@ -256,6 +168,98 @@ Conversion between date/time strings and Unix time, thread-safe localtime conver
 - `char *replace_date_time_with_unix(char *characterString, const char *delimiter, const int fieldCount)` - Replaces date/time with Unix time in a string.
 - `char **preprocess_string_array(char **stringArray, int stringCount, const char *delimiter)` - Preprocesses an array of strings, trimming and pruning whitespaces, repeated delimiters, and standardizing some variable parameters.
   
+
+
+
+
+
+
+<br/>
+<br/>
+<br/>
+
+
+
+### Auxiliary Utilities
+The `AuxiliaryUtilities.h` file includes several useful constants and macros designed to simplify common programming tasks and enhance code readability. Here are some of the key elements:
+
+#### Global Constants
+
+1. **MAX_STRING_SIZE**
+    - `static const size_t MAX_STRING_SIZE = 1000;` - Defines the maximum string size that can be handled by the utility functions, useful for setting buffer sizes and ensuring consistent memory allocation across different string operations.
+
+2. **months**
+    - `extern const char *months[12];` - Contains the names of the twelve months of the year, useful for converting numeric month representations into their corresponding textual names.
+
+3. **weekDays**
+    - `extern const char *weekDays[7];` - Holds the names of the seven days of the week, useful for mapping numeric day representations to their corresponding day names.
+
+4. **commonDateTimeFormats**
+    - `extern const char *commonDateTimeFormats[12];` - Contains string literals representing commonly used date/time formats, crucial for parsing and standardizing date/time strings from various data sources.
+
+#### Macros
+
+1. **ARRAY_SIZE**
+    - `#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))` - Computes the number of elements in a statically-allocated array, useful for determining the size of an array at compile time.
+
+2. **VAR_NAME_AS_STRING**
+    - `#define VAR_NAME_AS_STRING(var) #var` - Creates a string representation of its argument, useful for debugging and logging purposes.
+
+#### Mutex for Thread Safety
+
+The file also defines a mutex for thread safety when accessing local time functions:
+- `static pthread_mutex_t localtime_mutex = PTHREAD_MUTEX_INITIALIZER` - This mutex ensures that access to the `localtime` function is thread-safe, preventing potential data races in multi-threaded applications.
+
+
+
+
+
+
+<br/>
+<br/>  
+<br/>
+
+### General Utilities
+
+
+#### Time Operations
+Conversion between date/time strings and Unix time, thread-safe localtime conversion.
+- `time_t convert_to_unix_time(const char *dateTimeString)` - Converts a date/time string into Unix time.
+- `struct tm *thread_safe_localtime(const time_t *tim, struct tm *result)` - A thread-safe wrapper around localtime.
+<br/>
+
+
+  
+
+
+#### Bitwise Operations
+- `uint64_t flip_sign_bit(uint64_t value)` - Flips the sign bit of a 64-bit integer.
+- `uint64_t double_to_uint64(double value)` - Reinterprets a double as a uint64_t.
+- `double uint64_to_double(uint64_t value)` - Reinterprets a uint64_t as a double.
+<br/>
+
+
+  
+
+#### Sorting
+- `void merge_sort(double *unsortedData, const int numElements)` - Sorts an array of doubles using the merge sort algorithm.
+- `void radix_sort_doubles(double *unsortedData, const int numElements)` - Sorts an array of doubles using radix sort.
+<br/>
+
+
+  
+
+#### Memory Operations
+- `void *set_memory_block(void *block, int c, size_t n)` - Sets the first `n` bytes of the memory block to the value specified by `c`.
+- `void *copy_memory_block(void *destination, const void *source, size_t n)` - Copies `n` bytes from source to destination.
+<br/>
+
+
+
+
+
+
+
 
 
 
