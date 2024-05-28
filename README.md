@@ -265,22 +265,6 @@ Conversion between date/time strings and Unix time, thread-safe localtime conver
 <br/>
 <br/>
 
-## Documentation and Examples
-
-For detailed documentation of each function, please refer to the comments in the source files `AuxiliaryUtilities.h`, `AuxiliaryUtilities.c`, `StringUtilities.h`, and `StringUtilities.c`. Refer to the `main.c` file for example usage of the library functions.
-
-
-
-  
-<br/>
-
-## Contributing
-
-Contributions to the C-String Utilities Library are welcome. If you have any bug reports, feature requests, or improvements, please open an issue or submit a pull request on GitHub.
-
-<br/>
-<br/>
-
 
 ### NOTE
 For the sake of brevity, some of the less interesting sections were omitted from this README, among them include:
