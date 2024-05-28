@@ -4,7 +4,6 @@
 
 
 #include "StringUtilities.h"
-//#include <ctype.h>
 
 
 
@@ -196,10 +195,10 @@ int* string_is_date_time(const char *characterString, const char *delimiter, con
 	
 	// Allocate memory to store results. Each element represents a field with a value indicating whether it matches a date/time format.
 	int *results = (int *)malloc(fieldCount * sizeof(int));
-	char *copyOfString = duplicate_character_string(characterString);     // Create a duplicate of the input string because strtok modifies the string it processes.
+	char *copyOfString = duplicate_string(characterString);     // Create a duplicate of the input string because 'duplicate_string' modifies the string it processes.
 	
 	// Tokenize the duplicated string using the provided delimiter.
-	char *token = tokenize_character_string(copyOfString, delimiter);
+	char *token = tokenize_string(copyOfString, delimiter);
 	int index = 0; // Index for tracking current field.
 	
 	
@@ -238,7 +237,7 @@ int* string_is_date_time(const char *characterString, const char *delimiter, con
 		
 		// Increment the index and move to the next field(token) in the string.
 		index++;
-		token = tokenize_character_string(NULL, delimiter);
+		token = tokenize_string(NULL, delimiter);
 	}
 	// Cleanup
 	free(copyOfString);
@@ -302,6 +301,49 @@ bool string_array_contains_date_time(char **stringArray, int stringCount, const 
 
 
 
+
+
+
+
+size_t string_length(const char *characterString)
+{
+	register const char *s; // The 'register' keyword is a hint to the compiler to store the variable in a CPU register for faster access(though 'register' is mostly deprecated in modern C).
+	
+	for (s = characterString; *s; ++s); // Uses a pointer s to iterate over the characters in the string until the null terminator is reached.
+	return(s - characterString); // The difference between the final value of s and the original characterString gives the length of the string.
+	
+	/**
+	 size_t length = 0; // Initialize the length to zero
+	 while (*characterString++) // Iterate over the string until the null terminator is reached
+	 { length++; } return length; //*/
+}
+
+
+
+
+/**
+ * count_array_strings
+ *
+ * Counts the number of non-NULL strings in an array of strings. This function is useful for determining
+ * the length of an array where the end is marked by a NULL pointer.
+ *
+ * @param stringArray Array of strings, NULL-terminated.
+ * @return The count of non-NULL strings in the array.
+ */
+int count_array_strings(char **stringArray)
+{
+	// Check for NULL input and handle error.
+	if (stringArray == NULL){ return 0; }
+	
+	
+	int stringCount = 0;
+	while (stringArray[stringCount] != NULL)
+	{
+		stringCount++;
+	}
+	
+	return stringCount;
+}
 
 
 
@@ -663,7 +705,7 @@ const char* determine_string_representation_type(const char* token)
 	
 	
 	// Treat a single hyphen as non-numeric
-	if (compare_character_strings(token, "-") == 0)
+	if (compare_strings(token, "-") == 0)
 	{
 		return "nonnumeric";
 	}
@@ -686,206 +728,170 @@ const char* determine_string_representation_type(const char* token)
 
 
 
-size_t character_string_length(const char *characterString)
-{
-	register const char *s; // The 'register' keyword is a hint to the compiler to store the variable in a CPU register for faster access(though 'register' is mostly deprecated in modern C).
-	
-	for (s = characterString; *s; ++s); // Uses a pointer s to iterate over the characters in the string until the null terminator is reached.
-	return(s - characterString); // The difference between the final value of s and the original characterString gives the length of the string.
-	
-	/**
-	 size_t length = 0; // Initialize the length to zero
-	 while (*characterString++) // Iterate over the string until the null terminator is reached
-	 { length++; } return length; //*/
-}
 
 
 
 
 /**
- * count_array_strings
+ * duplicate_string
  *
- * Counts the number of non-NULL strings in an array of strings. This function is useful for determining
- * the length of an array where the end is marked by a NULL pointer.
+ * This function duplicates a string by allocating memory for a new string and copying the contents of the original string.
+ * The duplicated string is a deep copy, and the caller is responsible for freeing the memory allocated for the new string.
  *
- * @param stringArray Array of strings, NULL-terminated.
- * @return The count of non-NULL strings in the array.
+ * @param characterString The string to be duplicated.
+ * @return A pointer to the duplicated string, or NULL if memory allocation fails.
  */
-int count_array_strings(char **stringArray)
+char *duplicate_string(const char *characterString)
 {
-	// Check for NULL input and handle error.
-	if (stringArray == NULL){ return 0; }
-	
-	
-	int stringCount = 0;
-	while (stringArray[stringCount] != NULL)
+	if (characterString == NULL)
 	{
-		stringCount++;
+		return NULL; // Return NULL if the input string is NULL
 	}
 	
-	return stringCount;
-}
-
-
-
-
-
-
-/**
- * print_string
- *
- * Prints a string with a label.
- * Exists only for convenience in debugging.
- *
- * @param string string to be printed.
- */
-void print_string(char* string)
-{
-	// Check for NULL input and handle error.
-	if (string == NULL){ perror("\n\nError: string was NULL in 'print_string'.\n");      exit(1); }
+	size_t length = string_length(characterString) + 1; // Calculate the length of the string including the null terminator
+	char *dup = (char *)malloc(length); // Allocate memory for the duplicated string
 	
-	
-	printf("\n\n\n-----------------------------------------------------------------------------------------\n\n");
-	printf("%s", string);
-	printf("\n\n-----------------------------------------------------------------------------------------\n\n\n");
-}
-
-
-/**
- * print_string_array
- * Prints the elements of a string array with a label.
- *
- * @param stringArray Array of strings to be printed.
- * @param stringCount Number of strings in the array.
- * @param label Label to be printed before printing the array.
- */
-void print_string_array(char** stringArray, int stringCount, char*label)
-{
-	// Check for NULL input and handle error.
-	if(stringArray == NULL){ perror("\n\nError printing array of strings in 'print_string_array'.");      exit(1); }
-	
-	
-	printf("\n\n%s: \n", label);
-	for(int i = 0; i < stringCount; i++)
+	if (dup == NULL)
 	{
-		printf("\n%s", stringArray[i]);
-	}
-}
-
-
-/**
- * print_string_array_array
- *
- * This function prints the contents of an array of arrays of strings. It is assumed that all sub-arrays have the same dimension.
- * The output is formatted with a label and each string is printed on a new line.
- * The function first checks for NULL input to prevent errors. It then prints a label for the array.
- * It then iterates over the main array and for each sub-array, it calculates the length of the label, allocates memory for it,
- * and then prints the sub-array using the 'print_string_array' function.
- *
- * @param stringArrayArray The 2D array of strings to be printed.
- * @param stringArraysCount The number of sub-arrays in the main array.
- * @param stringSubArraysCount The number of strings in each sub-array.
- * @param label The label to be printed before printing the array.
- */
-void print_string_array_array(char*** stringArrayArray, int stringArraysCount, int stringSubArraysCount, char* label)
-{
-	// Check for NULL input and handle error.
-	if (stringArrayArray == NULL){ perror("\n\nError: stringArrayArray was NULL in 'print_string_array_array'.\n");      exit(1); }
-	
-	
-	printf("\nprint_string_array_array %s =========================================================================================", label);
-	printf("\n\n\n%s: \n", label);
-	// Iterate over the main array.
-	for (int i = 0; i < stringArraysCount; i++)
-	{
-		// For each sub-array, calculate the length of the label and allocate memory for it.
-		int subArrayLabelCharacterCount = character_string_length(label);
-		char* subArrayLabel = (char*)malloc((character_string_length(label) + 1) * sizeof(char));// = allocate_memory_char_ptr(strlen(label) + 1);
-		
-		// Print each sub-array.
-		print_string_array(stringArrayArray[i], stringSubArraysCount, "stringArrayArray[i]");
+		return NULL; // Return NULL if memory allocation fails
 	}
 	
-	printf("\n\n\n=========================================================================================\n\n");
+	copy_memory_block(dup, characterString, length); // Copy the original string to the newly allocated memory
+	return dup; // Return the pointer to the duplicated string
 }
 
-/**
- * print_array
- * Prints the elements of a double array with a label.
- *
- * @param n Number of elements in the array.
- * @param data Array of doubles to be printed.
- * @param label Label to be printed before printing the array.
- */
-void print_array(int n, double *data, char*label)
-{
-	// Check for NULL input and handle error.
-	if (data == NULL){ perror("\n\nError: data was NULL in 'print_array'.\n");      exit(1); }
-	
-	
-	printf("\n\n\n\n\n\n\n\n%s: \n", label);
-	// Loop through the characters print
-	for(int i = 0; i < n; i++)
-	{
-		printf("%.17g ", data[i]);
-	}
-	printf("\n\n\n");
-}
+
 
 
 /**
- * print_array_array
+ * copy_string
  *
- * This function prints the contents of a 2D array with each element
- * displayed to 17 decimal places. The output is formatted with a label and
- * surrounded by a visual border for clarity.
+ * This function copies the string pointed to by src, including the null terminator,
+ * to the buffer pointed to by dest. The destination buffer must be large enough to
+ * receive the copied string.
  *
- * @param data A pointer to a pointer of doubles representing a 2D array.
- * @param rows The number of rows in the 2D array.
- * @param columns The number of columns in each row.
- * @param label A string label for the array.
+ * @param destination The destination buffer where the string will be copied.
+ * @param source The source string to be copied.
+ * @return A pointer to the destination string.
  */
-void print_array_array(double **data, int rows, int columns, char*label)
+char *copy_string(char *destination, const char *source)
 {
-	// Check for NULL input and handle error.
-	if (data == NULL){ perror("\n\nError: data was NULL in 'print_array_array'.\n");      exit(1); }
+	char *dest_start = destination; // Save the start of destination buffer
 	
-	printf("\n\n\n\n\n\n\nprint_array_array %s =========================================================================================", label);
-	printf("\n\n%s: \n", label);
+	//while ((*destination++ = *source++) != '\0'); // Copy each character from source to destination including the null terminator
+	while ((*destination++ = *source++)); // Copy each character from src to dest, including the null terminator
 	
-	for (int i = 0; i < rows; i++)
-	{
-		
-		for (int j = 0; j < columns; j++)
-		{
-			printf("%.17g ", data[i][j]);
-		}
-		printf("\n"); // Newline after each row
-	}
-	printf("\n\n=========================================================================================\n\n");
+	return dest_start; // Return the start of the destination buffer
 }
+
+
 
 
 /**
- * print_char_ptr_array
- * Prints the elements of a string array.
+ * copy_n_string
  *
- * @param charPtrArr Array of strings to be printed.
- * @param stringCount Number of strings in the array.
+ * This function copies up to 'n' characters from the source string to the destination string.
+ * If the length of the source string is less than 'n', the remainder of the destination string is padded with null characters.
+ * The destination string must be large enough to receive the copy.
+ *
+ * @param destination The destination buffer where the content is to be copied.
+ * @param source The source null-terminated string to be copied.
+ * @param n The maximum number of characters to copy from source to destination.
+ * @return A pointer to the destination string.
  */
-void print_char_ptr_array(char *charPtrArr[],  int stringCount, char* label)
+char *copy_n_string(char *destination, const char *source, size_t n)
 {
-	// Check for NULL input and handle error.
-	if (charPtrArr == NULL){ perror("\n\nError: charPtrArr was NULL in 'print_char_ptr_array'.\n");      exit(1); }
+	char *dest_start = destination; // Save the start of the destination buffer
 	
 	
-	printf("\n\n\n\n\n\n\n\n%s: \n", label);
-	// Loop through the elements array and print
-	for (int i = 0; i < stringCount; i++)
+	// Copy up to n characters from source to destination
+	while (n > 0 && (*source != '\0'))
 	{
-		printf("%s", charPtrArr[i]);
+		*destination++ = *source++;
+		n--;
 	}
+	
+	
+	// Null-pad the remaining bytes
+	while (n > 0)
+	{
+		*destination++ = '\0';
+		n--;
+	}
+	
+	return dest_start; // Return the start of the destination buffer
 }
+
+
+
+
+/**
+ * concatenate_string
+ *
+ * This function concatenates the source string to the destination string.
+ * The destination string must have enough space to hold the concatenated result.
+ *
+ * @param destination The destination string to which the source string will be concatenated.
+ * @param source The source string to be concatenated.
+ * @return A pointer to the destination string.
+ */
+char *concatenate_string(char *destination, const char *source)
+{
+	char *dest_start = destination; // Save the start of destination buffer
+	
+	// Move dest to the end of the current string
+	while (*destination)
+	{
+		destination++;
+	}
+	
+	// Copy each character from source to destination, including the null terminator
+	while ((*destination++ = *source++));
+	
+	return dest_start; // Return the start of the destination buffer
+}
+
+
+
+
+
+
+
+/**
+ * concatenate_n_string
+ *
+ * Appends at most 'n' characters from the source string to the destination string,
+ * and then appends a null terminator. The destination string must have enough space
+ * to hold the resulting concatenated string.
+ *
+ * @param destination The destination string to which the source string will be concatenated.
+ * @param source The source string to be concatenated.
+ * @param n The maximum number of characters to concatenate from the source string.
+ * @return A pointer to the destination string.
+ */
+char *concatenate_n_string(char *destination, const char *source, size_t n)
+{
+	char *dest_start = destination; // Save the start of destination buffer
+	
+	// Move destination to the end of the current string
+	while (*destination)
+	{
+		destination++;
+	}
+	
+	// Copy up to 'n' characters from source to destination
+	while (n-- > 0 && *source)
+	{
+		*destination++ = *source++;
+	}
+	
+	// Null-terminate the destination string
+	*destination = '\0';
+	
+	return dest_start; // Return the start of the destination buffer
+}
+
+
 
 
 
@@ -930,7 +936,7 @@ char* determine_most_common_string(char **stringArray, int stringCount)
 		for(j = 0; j < i; j++)
 		{
 			// If the string is present, increment its count, done to keep track of the frequency of each unique string.
-			if(uniqueStrings[j] != NULL && compare_character_strings(stringArray[i], uniqueStrings[j]) == 0)
+			if(uniqueStrings[j] != NULL && compare_strings(stringArray[i], uniqueStrings[j]) == 0)
 			{
 				counts[j]++;
 				
@@ -954,7 +960,7 @@ char* determine_most_common_string(char **stringArray, int stringCount)
 	}
 	
 	// Allocate for the most common string and copy it to this location.
-	char* mostCommonString = duplicate_character_string(uniqueStrings[maxIndex]);
+	char* mostCommonString = duplicate_string(uniqueStrings[maxIndex]);
 	
 	// Cleanup.
 	free(uniqueStrings);
@@ -967,7 +973,7 @@ char* determine_most_common_string(char **stringArray, int stringCount)
 
 
 /**
- * compare_character_strings
+ * compare_strings
  *
  * Performs a binary comparison of the characters of the two strings and returns an integer value based on the
  * comparison result(0 if equal, -1 if less than, 1 if greater than).
@@ -980,7 +986,7 @@ char* determine_most_common_string(char **stringArray, int stringCount)
  * @param characterString2 The second character string to compare.
  * @return An integer value indicating the difference between the first non-matching characters.
  */
-int compare_character_strings(const char *characterString1, const char *characterString2)
+int compare_strings(const char *characterString1, const char *characterString2)
 {
 	// Handle unaligned bytes of characterString1 first
 	uintptr_t numUnalignedBytes = -(uintptr_t)characterString1 % sizeof(unsigned long); // Calculate the number of unaligned bytes
@@ -1049,84 +1055,31 @@ int compare_character_strings(const char *characterString1, const char *characte
 
 
 /**
- * split_string_tokens
+ * combine_strings
  *
- * Splits a string into an array of strings based on a given delimiter.
- *
- *
- * @param characterString The string to be split.
- * @param delimiter The delimiter used to split the string.
- * @param divisions The maximum number of parts to split the string into.
- * @return An array of strings, each representing a part of the original string.
- */
-char** split_string_tokens(const char* characterString, const char* delimiter, int divisions)
-{
-	char** parts = (char**)malloc(sizeof(char*) * (divisions + 1));
-	if (parts == NULL)
-	{
-		fprintf(stderr, "Memory allocation failed in split_string\n");
-		exit(EXIT_FAILURE);
-	}
-	
-	char* strCopy = duplicate_character_string(characterString); // Duplicate the string to avoid modifying the original
-	if (strCopy == NULL)
-	{
-		fprintf(stderr, "Memory allocation failed in split_string\n");
-		exit(EXIT_FAILURE);
-	}
-	
-	
-	//printf("\n\n\n\n characterString: %s \ndivisions: %d \ndelimiter: %s", characterString, divisions, delimiter);
-	char* token = tokenize_character_string(strCopy, delimiter);
-	int i = 0;
-	while (token != NULL && i < divisions)
-	{
-		parts[i] = duplicate_character_string(token);
-		
-		if (parts[i] == NULL)
-		{
-			fprintf(stderr, "Memory allocation failed in split_string\n");
-			exit(EXIT_FAILURE);
-		}
-		
-		token = tokenize_character_string(NULL, delimiter);
-		i++;
-	}
-	//print_string_array(parts, i, "split_string_tokens parts");
-	
-	parts[i] = NULL; // Null-terminate the array
-	free(strCopy);
-	return parts;
-}
-
-
-
-
-/**
- * combine_char_ptr
- *
- * Concatenates two strings into a new string.Allocates memory for the new string
- * and combines the contents of the two input strings. Handles NULL inputs by treating
- * them as empty strings.
+ * Combine two strings into a new string. Allocates memory for the new string, intitializes
+ * it with the first input string, and appends the contents of the second input string to the first.
+ * Handles NULL inputs by treating them as empty strings.
  *
  * @param characterString1 The first character string.
  * @param characterString2 The second character string.
  * @return A pointer to the combined new string.
  */
-char *combine_char_ptr(const char* characterString1, const char* characterString2)
+char *combine_strings(const char* characterString1, const char* characterString2)
 {
+	// Check for NULL input and handle error.
 	if (characterString1 == NULL) characterString1 = " ";
 	if (characterString2 == NULL) characterString2 = " ";
 	
 	
 	/* Determine Count of Characters of Both Strings and Allocate Memory Appropriately */
-	int characterCount = character_string_length(characterString1) + 1 + character_string_length(characterString2) + 1;
+	int characterCount = string_length(characterString1) + 1 + string_length(characterString2) + 1;
 	char *combinedString = (char*)malloc(characterCount * sizeof(char));   //Allocate memory based on character count.
 	
 	
 	/* Populate the CombinedString with the contents of the two strings */
-	copy_character_string(combinedString, characterString1);     // Initialize with the first string.
-	concatenate_character_string(combinedString, characterString2);   // Append the second string to the first.
+	copy_string(combinedString, characterString1);     // Initialize with the first string.
+	concatenate_string(combinedString, characterString2);   // Append the second string to the first.
 	
 	return combinedString;
 }
@@ -1135,7 +1088,7 @@ char *combine_char_ptr(const char* characterString1, const char* characterString
 
 
 /**
- * combine_char_ptr_ptr
+ * combine_string_arrays
  *
  * Merges two arrays of strings into a new array. Each element of the new array is
  * created by concatenating corresponding elements from the two input arrays.
@@ -1148,11 +1101,11 @@ char *combine_char_ptr(const char* characterString1, const char* characterString
  * @param stringCountArray2 The number of strings in the second array.
  * @return A pointer to the combined new array of strings.
  */
-char **combine_char_ptr_ptr(const char **stringArray1, int stringCountArray1, const char **stringArray2, int stringCountArray2)
+char **combine_string_arrays(const char **stringArray1, int stringCountArray1, const char **stringArray2, int stringCountArray2)
 {
 	// Check for NULL input and handle error.
-	if (stringArray1 == NULL){ perror("\n\nError: stringArray1 was NULL in 'combine_char_ptr_ptr'.\n");      exit(1); }
-	if (stringArray2 == NULL){ perror("\n\nError: stringArray2 was NULL in 'combine_char_ptr_ptr'.\n");      exit(1); }
+	if (stringArray1 == NULL){ perror("\n\nError: stringArray1 was NULL in 'combine_string_arrays'.\n");      exit(1); }
+	if (stringArray2 == NULL){ perror("\n\nError: stringArray2 was NULL in 'combine_string_arrays'.\n");      exit(1); }
 	
 	
 	/* Determine the total number of strings and allocate memory appropriately */
@@ -1161,7 +1114,7 @@ char **combine_char_ptr_ptr(const char **stringArray1, int stringCountArray1, co
 																					 //For each pointer, allocate memory for a char pointer
 	for(size_t i = 0; i < (maxNumStrings + 1); i++)
 	{
-		combinedStringArray[i] = (char*)malloc(character_string_length(*stringArray1) * sizeof(char));// = allocate_memory_char_ptr(strSize);
+		combinedStringArray[i] = (char*)malloc(string_length(*stringArray1) * sizeof(char));// = allocate_memory_char_ptr(strSize);
 	}
 	
 	
@@ -1179,7 +1132,7 @@ char **combine_char_ptr_ptr(const char **stringArray1, int stringCountArray1, co
 		if (str2 == NULL) str2 = "";
 		
 		
-		combinedStringArray[i] = combine_char_ptr(str1, str2);
+		combinedStringArray[i] = combine_strings(str1, str2);
 		
 		free(str1);
 		free(str2);
@@ -1210,7 +1163,7 @@ char **combine_char_ptr_ptr(const char **stringArray1, int stringCountArray1, co
 
 
 /**
- * combine_char_ptr_arr
+ * append_string_array_to_string
  *
  * Combines a string with each string in an array, creating a new combined string.
  * Allocates memory for a new string that combines the initial string with each string in the array.
@@ -1220,22 +1173,40 @@ char **combine_char_ptr_ptr(const char **stringArray1, int stringCountArray1, co
  * @param stringCount The number of strings in the array.
  * @return A pointer to the newly allocated combined string.
  */
-char *combine_char_ptr_arr(const char *characterString1, const char *characterStringArray[], int stringCount)
+char *append_string_array_to_string(const char *characterString1, const char *characterStringArray[], int stringCount, const char *delimiter)
 {
 	// Check for NULL input and handle error.
 	if (characterString1 == NULL || characterStringArray == NULL){ perror("\n\nError: characterString1 and/or characterStringArray was NULL in 'combine_char_ptr_arr'.\n");      return NULL; }
 	
 	
-	int characterCount = character_string_length(characterString1) + 1; // +1 for the null terminator
+	size_t characterCount = string_length(characterString1) + 1; // +1 for the null terminator
+	for(int i = 0; i < stringCount && characterStringArray[i] != NULL; i++)
+	{
+		characterCount += string_length(characterStringArray[i]);
+	}
+	
+	
 	char *combinedString = (char*)malloc(characterCount * sizeof(char)); //initialize with memory to copy first string
+	copy_string(combinedString, characterString1); // Initialize the string
 	
 	
 	for(int i = 0; i < stringCount; i++)
 	{
-		characterCount += character_string_length(characterStringArray[i]);
-		combinedString = combine_char_ptr(characterString1, characterStringArray[i]); //append each string in the string array to the combined string
+		concatenate_string(combinedString, characterStringArray[i]);  //append each string in the string array to the combined string
 		
+		
+		// Insert the delimiter between strings
+		if (i < stringCount - 1 && characterStringArray[i + 1] != NULL) // Last string in the string array is not reached and the next string is not null(avoids interruptor strings)
+		{
+			// Because it is assumed we are in the midst of concatenating strings, the number of delimiters should be less than
+			// or equal to the number of strings in the array, if the number of delimiters is equal to or greater than the number
+			// of strings at any point, then it means that either the delimiter is not present as intended in the string
+			// array(very unlikely at this point) or it means that the delimiting character has been inserted into the string
+			// array at some point in an unintended manner.
+			concatenate_string(combinedString, delimiter);
+		}
 	}
+	
 	return combinedString;
 }
 
@@ -1245,7 +1216,7 @@ char *combine_char_ptr_arr(const char *characterString1, const char *characterSt
 /**
  * concatenate_string_array
  *
- * Concatenates an array of strings into one single string, separated by commas.
+ * Concatenates each string from an array of strings into one single string, separated by commas(not strictly commas, but whatever delimiter is passed in, commas by convention).
  * Each element from the passed in character double pointer(used here as an array of arrays of characters) is itself a character pointer(used here as an array of characters),
  * meaning that the (individual characters) from a double pointer char(effectively an array of strings) to create one single string , separated by commas.
  *
@@ -1264,7 +1235,7 @@ char* concatenate_string_array(const char** stringArray, int stringCount, const 
 	size_t totalLength = 0;
 	for (int i = 0; i < stringCount && stringArray[i] != NULL; i++)
 	{
-		totalLength += character_string_length(stringArray[i]) + 1; // +1 for comma or null terminator
+		totalLength += string_length(stringArray[i]) + 1; // +1 for comma or null terminator
 	}
 	
 	// Allocate memory for the concatenated string
@@ -1275,7 +1246,7 @@ char* concatenate_string_array(const char** stringArray, int stringCount, const 
 	int *emptyStringIndices = (int*)malloc(stringCount * sizeof(int)); // = allocate_memory_int_ptr(stringCount); // Track the indices of empty strings
 	for (int i = 0; i < stringCount; i++)
 	{
-		if((stringArray[i] == NULL) || (compare_character_strings(stringArray[i], "") == 0) || (character_string_length(stringArray[i]) == 0) || (stringArray[i] == '\0') || (compare_character_strings(stringArray[i], delimiter) == 0))
+		if((stringArray[i] == NULL) || (compare_strings(stringArray[i], "") == 0) || (string_length(stringArray[i]) == 0) || (stringArray[i] == (void *)0) || (compare_strings(stringArray[i], delimiter) == 0))
 		{
 			emptyStringCount++;
 			emptyStringIndices[i] = 1; // A value of 1 indicates an empty string and a value of 0 indicates a non-empty string
@@ -1290,14 +1261,14 @@ char* concatenate_string_array(const char** stringArray, int stringCount, const 
 	
 	
 	// Concatenate the fields
-	copy_character_string(concatenated, ""); // Initialize the string
+	copy_string(concatenated, ""); // Initialize the string
 	for (int i = 0; i < stringCount && stringArray[i] != NULL; i++)
 	{
 		if(emptyStringIndices[i] == 1) // This string is empty
 		{
 			continue; // Skip this string
 		}
-		concatenate_character_string(concatenated, stringArray[i]);
+		concatenate_string(concatenated, stringArray[i]);
 		
 		
 		if (i < stringCount - 1 && stringArray[i + 1] != NULL)// && count_character_occurrences(concatenated, delimiter[0]) < (stringCount - emptyStringCount) ) // Last string in the string array is not reached, the next string is not null(avoids interruptor strings), and the occurences of the delimiter is less than the number of strings
@@ -1308,7 +1279,7 @@ char* concatenate_string_array(const char** stringArray, int stringCount, const 
 			// character has been inserted into the string array at some point in an unintended manner.
 			
 			// If the last element in the string array is the delimiter then it means that either the last string is empty or the delimiter was inserted into the string array at some point in an unintended manner
-			concatenate_character_string(concatenated, delimiter);
+			concatenate_string(concatenated, delimiter);
 		}
 	}
 	
@@ -1321,131 +1292,124 @@ char* concatenate_string_array(const char** stringArray, int stringCount, const 
 
 
 
+
 /**
- * replace_date_time_with_unix
+ * tokenize_string
  *
- * This function performs the task of replacing date/time fields in a given string with their Unix time
- * representations. It identifies date/time fields based on predefined formats and performs the
- * conversion when a field is a date/time string.
+ * This function tokenizes a string based on a delimiter character and returns the next token.
+ * It is similar to the standard strtok function but is reentrant and thread-safe.
  *
- * The function begins by calling the string_is_date_time function to get an array indicating which fields are date/time fields.
- * It then counts the number of fields that are identified as date/time fields.
- * The function then estimates the size of the output string based on the number of date/time fields and the length of the input string.
- * It allocates memory for the output string based on the estimated size.
- * The function then duplicates the input string to avoid modifying it directly, as strtok modifies the string it processes.
- * It then initializes the output string to an empty string and tokenizes the copied string using the delimiter character.
- * The function then iterates over each token(field) in the string, checking if the current field is a date/time field.
- * If it is, it converts the date/time field to Unix time, prepares a string to hold the Unix time, and appends the Unix time string to the output.
- * If the field is not a date/time field, it appends it directly to the output.
- * The function then appends the delimiter for the next field and increments the index.
- * After iterating over all the fields, the function frees the memory allocated for the copy of the input string and the dateTimeIndicators array.
- * It then null-terminates the new string and reallocates the output to fit the actual length.
- * Finally, it returns the dynamically allocated output string.
- *
- *
- * @param characterString Pointer to the string to be interpreted.
- * @param delimiter The delimiter character used to identify consecutive occurrences.
- * @param fieldCount The number of fields found in the string.
- * @return A pointer to the newly allocated string with the date/time fields replaced with Unix time representations.
+ * @param s The string to be tokenized.
+ * @param delim The delimiter character used to tokenize the string.
+ * @return A pointer to the next token in the string, or NULL if no more tokens are found.
  */
-char* replace_date_time_with_unix(char* characterString, const char *delimiter, const int fieldCount)
+char *tokenize_string(char *s, const char *delim)
 {
-	// Call the string_is_date_time function to get an array indicating which fields are date/time fields.
-	int *dateTimeIndicators = string_is_date_time(characterString, delimiter, fieldCount);
+	// Register variables for optimization
+	register char *spanp;
+	register int c, sc;
+	char *tok;
+	static char *last;
 	
-	// Count the number of fields that are identified as date/time fields.
-	int dateTimeCount = 0;
-	for(int i = 0; i < fieldCount; i++)
+	// If s is NULL, use the saved pointer last
+	if (s == NULL && (s = last) == NULL)
+		return (NULL);
+	
+	// Skip leading delimiters
+cont:
+	c = *s++;
+	for (spanp = (char *)delim; (sc = *spanp++) != 0;)
 	{
-		if(dateTimeIndicators[i] == 1)
-		{
-			dateTimeCount++;
-		}
+		if (c == sc)
+			goto cont;
 	}
 	
-	if(dateTimeCount == 0)
+	// If the end of the string is reached, return NULL
+	if (c == 0)
 	{
-		//perror("\n\nError: No date/time fields found in the string in 'replace_date_time_with_unix'.");
-		return NULL;
+		last = NULL;
+		return (NULL);
 	}
+	tok = s - 1;
 	
-	
-	// The max Unix timestamp is theoretically up to 9,223,372,036,854,775,807, far in the future and has 19 digits, so max length would be 20 characters(19 plus null terminator)
-	size_t estimatedOutputSize = character_string_length(characterString) + dateTimeCount * 20;
-	
-	
-	
-	// Allocate memory for the output string based on the estimated size.
-	char *output = (char *)malloc(estimatedOutputSize);
-	
-	// Duplicate the input string to avoid modifying it directly, as strtok modifies the string it processes.
-	char* copyOfString = duplicate_character_string(characterString);
-	
-	
-	
-	
-	output[0] = '\0'; // Initialize the output string to an empty string
-	char* token = tokenize_character_string(copyOfString, delimiter);  // Tokenize the copied string using the delimiter character.
-	int index = 0; // Initialize an index to track the current field
-	
-	// Iterate over each token(field) in the string.
-	while (token != NULL)
+	// Scan the token
+	for (;;)
 	{
-		// Check if the current field is a date/time field.
-		if (dateTimeIndicators[index] == 1)
+		c = *s++;
+		spanp = (char *)delim;
+		do
 		{
-			// Convert the date/time field to Unix time.
-			time_t unixTime = convert_to_unix_time(token);
-			
-			// Prepare a string to hold the Unix time.
-			char unixTimeString[20];
-			snprintf(unixTimeString, sizeof(unixTimeString), "%ld", unixTime);
-			
-			// Append the Unix time string to the output.
-			concatenate_n_character_string(output, unixTimeString, estimatedOutputSize - character_string_length(output) - 1);
-		}
-		else
-		{
-			// If the field is not a date/time field, append it directly to the output.
-			concatenate_n_character_string(output, token, character_string_length(token) + 1);
-		}
-		
-		
-		// Append delimiter for next field.
-		token = tokenize_character_string(NULL, delimiter);
-		if (token != NULL && character_string_length(token) > 0 && index < fieldCount - 1)
-		{
-			concatenate_character_string(output, delimiter);
-		}
-		
-		// Increment the index
-		index++;
+			if ((sc = *spanp++) == c)
+			{
+				if (c == 0)
+					s = NULL;
+				else
+					s[-1] = 0;
+				last = s;
+				return (tok);
+			}
+		} while (sc != 0);
 	}
-	
-	// Free the memory allocated for the copy of the input string and the dateTimeIndicators array.
-	free(copyOfString);
-	free(dateTimeIndicators);
-	
-	
-	
-	concatenate_character_string(output, "\0"); // Null-terminate the new string
-	
-	
-	
-	// Reallocate output to fit actual length.
-	// Included here because the estimated size has to be able to account for the maximum possible size of the
-	// outputted string, and since the outputted string usually changes minimnally in length from the inputtted string, it means that the estimate
-	// often greatly exceeds the actual needed size, hence it's good practice to reallocate here.
-	char *fitoutput = realloc(output, character_string_length(output) + 1);
-	if (fitoutput)
-	{
-		output = fitoutput;
-	}
-	
-	
-	// Return the dynamically allocated output string.
-	return output;
+	// NOTREACHED
 }
+
+
+
+
+/**
+ * split_tokenized_string
+ *
+ * Splits a string into an array of strings based on a given delimiter.
+ *
+ *
+ * @param characterString The string to be split.
+ * @param delimiter The delimiter used to split the string.
+ * @param divisions The maximum number of parts to split the string into.
+ * @return An array of strings, each representing a part of the original string.
+ */
+char** split_tokenized_string(const char* characterString, const char* delimiter, int divisions)
+{
+	char** parts = (char**)malloc(sizeof(char*) * (divisions + 1));
+	if (parts == NULL)
+	{
+		fprintf(stderr, "Memory allocation failed in split_tokenized_string\n");
+		exit(EXIT_FAILURE);
+	}
+	
+	char* strCopy = duplicate_string(characterString); // Duplicate the string to avoid modifying the original
+	if (strCopy == NULL)
+	{
+		fprintf(stderr, "Memory allocation failed in split_tokenized_string\n");
+		exit(EXIT_FAILURE);
+	}
+	
+	
+	//printf("\n\n\n\n characterString: %s \ndivisions: %d \ndelimiter: %s", characterString, divisions, delimiter);
+	char* token = tokenize_string(strCopy, delimiter);
+	int i = 0;
+	while (token != NULL && i < divisions)
+	{
+		parts[i] = duplicate_string(token);
+		
+		if (parts[i] == NULL)
+		{
+			fprintf(stderr, "Memory allocation failed in split_tokenized_string\n");
+			exit(EXIT_FAILURE);
+		}
+		
+		token = tokenize_string(NULL, delimiter);
+		i++;
+	}
+	//print_string_array(parts, i, "split_tokenized_string parts");
+	
+	parts[i] = NULL; // Null-terminate the array
+	free(strCopy);
+	return parts;
+}
+
+
+
+
 
 
 
@@ -1491,7 +1455,7 @@ char *trim_string_whitespaces(char* untrimmedString)
 	
 	
 	// Find the last non-whitespace character
-	for (endPtr = untrimmedString + character_string_length(untrimmedString) - 1; endPtr > startPtr && char_is_whitespace((unsigned char)*endPtr); endPtr--);
+	for (endPtr = untrimmedString + string_length(untrimmedString) - 1; endPtr > startPtr && char_is_whitespace((unsigned char)*endPtr); endPtr--);
 	
 	
 	
@@ -1508,7 +1472,7 @@ char *trim_string_whitespaces(char* untrimmedString)
 	
 	
 	// Copy the trimmed content
-	copy_n_character_string(trimmedString, startPtr, trimmedLength);
+	copy_n_string(trimmedString, startPtr, trimmedLength);
 	trimmedString[trimmedLength] = '\0'; // Null-terminate the new string
 	return trimmedString;
 }
@@ -1535,7 +1499,7 @@ char *prune_string_whitespaces(char *unprunedString)
 	}
 	
 	// Allocate memory for the new string
-	char *prunedString = (char *)malloc(character_string_length(unprunedString) + 1);
+	char *prunedString = (char *)malloc(string_length(unprunedString) + 1);
 	if (!prunedString)
 	{
 		return NULL; // Allocation failed
@@ -1559,7 +1523,7 @@ char *prune_string_whitespaces(char *unprunedString)
 	
 	
 	// Reallocate prunedString to fit the actual pruned length
-	char *fitString = realloc(prunedString, character_string_length(prunedString) + 1);
+	char *fitString = realloc(prunedString, string_length(prunedString) + 1);
 	if (fitString)
 	{
 		prunedString = fitString;
@@ -1595,7 +1559,7 @@ char *prune_repeated_delimiters_from_string(char *unprunedString, const char *de
 	
 	
 	/// Allocate Memory for the New Pruned String
-	size_t originalLength = character_string_length(unprunedString) + 1;
+	size_t originalLength = string_length(unprunedString) + 1;
 	size_t newLength = originalLength; // Initial estimate of new length
 	
 	
@@ -1652,7 +1616,7 @@ char *prune_repeated_delimiters_from_string(char *unprunedString, const char *de
 	
 	
 	// Reallocate the pruned string to fit the actual length
-	char *fitString = realloc(prunedString, character_string_length(prunedString) + 1);
+	char *fitString = realloc(prunedString, string_length(prunedString) + 1);
 	if (fitString)
 	{
 		prunedString = fitString;
@@ -1748,79 +1712,182 @@ char *prune_and_trim_problematic_characters_from_string(char *originalString, co
 
 
 
-
-
-
-
-char *tokenize_character_string(char *s, const char *delim)
+/**
+ * replace_date_time_with_unix
+ *
+ * This function performs the task of replacing date/time fields in a given string with their Unix time
+ * representations. It identifies date/time fields based on predefined formats and performs the
+ * conversion when a field is a date/time string.
+ *
+ * The function begins by calling the string_is_date_time function to get an array indicating which fields are date/time fields.
+ * It then counts the number of fields that are identified as date/time fields.
+ * The function then estimates the size of the output string based on the number of date/time fields and the length of the input string.
+ * It allocates memory for the output string based on the estimated size.
+ * The function then duplicates the input string to avoid modifying it directly, as strtok modifies the string it processes.
+ * It then initializes the output string to an empty string and tokenizes the copied string using the delimiter character.
+ * The function then iterates over each token(field) in the string, checking if the current field is a date/time field.
+ * If it is, it converts the date/time field to Unix time, prepares a string to hold the Unix time, and appends the Unix time string to the output.
+ * If the field is not a date/time field, it appends it directly to the output.
+ * The function then appends the delimiter for the next field and increments the index.
+ * After iterating over all the fields, the function frees the memory allocated for the copy of the input string and the dateTimeIndicators array.
+ * It then null-terminates the new string and reallocates the output to fit the actual length.
+ * Finally, it returns the dynamically allocated output string.
+ *
+ *
+ * @param characterString Pointer to the string to be interpreted.
+ * @param delimiter The delimiter character used to identify consecutive occurrences.
+ * @param fieldCount The number of fields found in the string.
+ * @return A pointer to the newly allocated string with the date/time fields replaced with Unix time representations.
+ */
+char* replace_date_time_with_unix(char* characterString, const char *delimiter, const int fieldCount)
 {
-	// Register variables for optimization
-	register char *spanp;
-	register int c, sc;
-	char *tok;
-	static char *last;
+	// Call the string_is_date_time function to get an array indicating which fields are date/time fields.
+	int *dateTimeIndicators = string_is_date_time(characterString, delimiter, fieldCount);
 	
-	// If s is NULL, use the saved pointer last
-	if (s == NULL && (s = last) == NULL)
-		return (NULL);
-	
-	// Skip leading delimiters
-cont:
-	c = *s++;
-	for (spanp = (char *)delim; (sc = *spanp++) != 0;)
+	// Count the number of fields that are identified as date/time fields.
+	int dateTimeCount = 0;
+	for(int i = 0; i < fieldCount; i++)
 	{
-		if (c == sc)
-			goto cont;
-	}
-	
-	// If the end of the string is reached, return NULL
-	if (c == 0)
-	{
-		last = NULL;
-		return (NULL);
-	}
-	tok = s - 1;
-	
-	// Scan the token
-	for (;;)
-	{
-		c = *s++;
-		spanp = (char *)delim;
-		do
+		if(dateTimeIndicators[i] == 1)
 		{
-			if ((sc = *spanp++) == c)
-			{
-				if (c == 0)
-					s = NULL;
-				else
-					s[-1] = 0;
-				last = s;
-				return (tok);
-			}
-		} while (sc != 0);
+			dateTimeCount++;
+		}
 	}
-	// NOTREACHED
-}
-
-
-
-char *duplicate_character_string(const char *characterString)
-{
-	if (characterString == NULL)
+	
+	if(dateTimeCount == 0)
 	{
-		return NULL; // Return NULL if the input string is NULL
+		//perror("\n\nError: No date/time fields found in the string in 'replace_date_time_with_unix'.");
+		return NULL;
 	}
 	
-	size_t length = character_string_length(characterString) + 1; // Calculate the length of the string including the null terminator
-	char *dup = (char *)malloc(length); // Allocate memory for the duplicated string
 	
-	if (dup == NULL) {
-		return NULL; // Return NULL if memory allocation fails
+	// The max Unix timestamp is theoretically up to 9,223,372,036,854,775,807, far in the future and has 19 digits, so max length would be 20 characters(19 plus null terminator)
+	size_t estimatedOutputSize = string_length(characterString) + dateTimeCount * 20;
+	
+	
+	
+	// Allocate memory for the output string based on the estimated size.
+	char *output = (char *)malloc(estimatedOutputSize);
+	
+	// Duplicate the input string to avoid modifying it directly, as strtok modifies the string it processes.
+	char* copyOfString = duplicate_string(characterString);
+	
+	
+	
+	
+	output[0] = '\0'; // Initialize the output string to an empty string
+	char* token = tokenize_string(copyOfString, delimiter);  // Tokenize the copied string using the delimiter character.
+	int index = 0; // Initialize an index to track the current field
+	
+	// Iterate over each token(field) in the string.
+	while (token != NULL)
+	{
+		// Check if the current field is a date/time field.
+		if (dateTimeIndicators[index] == 1)
+		{
+			// Convert the date/time field to Unix time.
+			time_t unixTime = convert_to_unix_time(token);
+			
+			// Prepare a string to hold the Unix time.
+			char unixTimeString[20];
+			snprintf(unixTimeString, sizeof(unixTimeString), "%ld", unixTime);
+			
+			// Append the Unix time string to the output.
+			concatenate_n_string(output, unixTimeString, estimatedOutputSize - string_length(output) - 1);
+		}
+		else
+		{
+			// If the field is not a date/time field, append it directly to the output.
+			concatenate_n_string(output, token, string_length(token) + 1);
+		}
+		
+		
+		// Append delimiter for next field.
+		token = tokenize_string(NULL, delimiter);
+		if (token != NULL && string_length(token) > 0 && index < fieldCount - 1)
+		{
+			concatenate_string(output, delimiter);
+		}
+		
+		// Increment the index
+		index++;
 	}
 	
-	copy_memory_block(dup, characterString, length); // Copy the original string to the newly allocated memory
-	return dup; // Return the pointer to the duplicated string
+	// Free the memory allocated for the copy of the input string and the dateTimeIndicators array.
+	free(copyOfString);
+	free(dateTimeIndicators);
+	
+	
+	
+	concatenate_string(output, "\0"); // Null-terminate the new string
+	
+	
+	
+	// Reallocate output to fit actual length.
+	// Included here because the estimated size has to be able to account for the maximum possible size of the
+	// outputted string, and since the outputted string usually changes minimnally in length from the inputtted string, it means that the estimate
+	// often greatly exceeds the actual needed size, hence it's good practice to reallocate here.
+	char *fitoutput = realloc(output, string_length(output) + 1);
+	if (fitoutput)
+	{
+		output = fitoutput;
+	}
+	
+	
+	// Return the dynamically allocated output string.
+	return output;
 }
+
+
+
+
+/**
+ * preprocess_string_array
+ *
+ * Processes an array of strings by trimming whitespace, pruning whitespace, handling repeated delimiters, and replacing date/time fields with Unix time.
+ * The function first trims leading and trailing whitespaces, then removes all internal whitespaces,
+ * handles repeated delimiters by inserting '0' characters, and finally replaces any date/time fields with their Unix time equivalents.
+ *
+ * @param stringArray Pointer to the array of strings to be processed.
+ * @param stringCount Number of strings in the array.
+ * @param delimiter Pointer to the delimiter character used in the strings.
+ * @return Pointer to the newly created array of processed strings, or NULL in case of an error or if the original string array is NULL.
+ */
+char **preprocess_string_array(char **stringArray, int stringCount, const char *delimiter)
+{
+	// Check for NULL input and handle error.
+	if (stringArray == NULL){ perror("\n\nError: stringArray was NULL in 'preprocess_string_array'.\n");      return 0; }
+	
+	
+	// Allocate memory for the new array
+	char **processedStringArray = (char **)malloc((stringCount + 1) * sizeof(char *));
+	if (processedStringArray == NULL)
+	{
+		perror("\n\nError: Memory allocation failed in 'preprocess_string_array'.\n");
+		exit(EXIT_FAILURE);
+	}
+	
+	
+	// Process each string in the array
+	for (int i = 0; i < stringCount; i++)
+	{
+		processedStringArray[i] = prune_and_trim_problematic_characters_from_string(stringArray[i], delimiter, stringCount);
+	}
+	
+	// Null-terminate the array
+	processedStringArray[stringCount] = NULL;
+	return processedStringArray;
+}
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1828,129 +1895,150 @@ char *duplicate_character_string(const char *characterString)
 
 
 /**
- * copy_character_string
+ * print_string
+ * Prints a string with a label.
  *
- * This function copies the string pointed to by src, including the null terminator,
- * to the buffer pointed to by dest. The destination buffer must be large enough to
- * receive the copied string.
- *
- * @param destination The destination buffer where the string will be copied.
- * @param source The source string to be copied.
- * @return A pointer to the destination string.
+ * @param string string to be printed.
  */
-char *copy_character_string(char *destination, const char *source)
+void print_string(char* string)
 {
-	char *dest_start = destination; // Save the start of destination buffer
-	
-	//while ((*destination++ = *source++) != '\0'); // Copy each character from source to destination including the null terminator
-	while ((*destination++ = *source++)); // Copy each character from src to dest, including the null terminator
-	
-	return dest_start; // Return the start of the destination buffer
+	// Check for NULL input and handle error.
+	if (string == NULL){ perror("\n\nError: string was NULL in 'print_string'.\n");      exit(1); }
+	printf("\n\n\n-----------------------------------------------------------------------------------------\n\n");
+	printf("%s", string);
+	printf("\n\n-----------------------------------------------------------------------------------------\n\n\n");
 }
-
-
 
 
 /**
- * copy_n_character_string
+ * print_string_array
+ * Prints the elements of a string array with a label.
  *
- * This function copies up to 'n' characters from the source string to the destination string.
- * If the length of the source string is less than 'n', the remainder of the destination string is padded with null characters.
- * The destination string must be large enough to receive the copy.
- *
- * @param destination The destination buffer where the content is to be copied.
- * @param source The source null-terminated string to be copied.
- * @param n The maximum number of characters to copy from source to destination.
- * @return A pointer to the destination string.
+ * @param stringArray Array of strings to be printed.
+ * @param stringCount Number of strings in the array.
+ * @param label Label to be printed before printing the array.
  */
-char *copy_n_character_string(char *destination, const char *source, size_t n)
+void print_string_array(char** stringArray, int stringCount, char*label)
 {
-	char *dest_start = destination; // Save the start of the destination buffer
-	
-	
-	// Copy up to n characters from source to destination
-	while (n > 0 && (*source != '\0')) 
-	{
-		*destination++ = *source++;
-		n--;
-	}
-	
-	
-	// Null-pad the remaining bytes
-	while (n > 0)
-	{
-		*destination++ = '\0';
-		n--;
-	}
-	
-	return dest_start; // Return the start of the destination buffer
+	// Check for NULL input and handle error.
+	if(stringArray == NULL){ perror("\n\nError printing array of strings in 'print_string_array'.");      exit(1); }
+	printf("\n\n%s: \n", label);
+	for(int i = 0; i < stringCount; i++)
+	{ printf("\n%s", stringArray[i]); } printf("\n\n");
 }
-
-
 
 
 /**
- * concatenate_character_string
+ * print_string_array_array
  *
- * This function concatenates the source string to the destination string.
- * The destination string must have enough space to hold the concatenated result.
+ * This function prints the contents of an array of arrays of strings. It is assumed that all sub-arrays have the same dimension.
+ * The output is formatted with a label and each string is printed on a new line.
+ * The function first checks for NULL input to prevent errors. It then prints a label for the array.
+ * It then iterates over the main array and for each sub-array, it calculates the length of the label, allocates memory for it,
+ * and then prints the sub-array using the 'print_string_array' function.
  *
- * @param destination The destination string to which the source string will be concatenated.
- * @param source The source string to be concatenated.
- * @return A pointer to the destination string.
+ * @param stringArrayArray The 2D array of strings to be printed.
+ * @param stringArraysCount The number of sub-arrays in the main array.
+ * @param stringSubArraysCount The number of strings in each sub-array.
+ * @param label The label to be printed before printing the array.
  */
-char *concatenate_character_string(char *destination, const char *source)
+void print_string_array_array(char*** stringArrayArray, int stringArraysCount, int stringSubArraysCount, char* label)
 {
-	char *dest_start = destination; // Save the start of destination buffer
-	
-	// Move dest to the end of the current string
-	while (*destination)
+	// Check for NULL input and handle error.
+	if (stringArrayArray == NULL){ perror("\n\nError: stringArrayArray was NULL in 'print_string_array_array'.\n");      exit(1); }
+	printf("\nprint_string_array_array %s =========================================================================================", label);
+	printf("\n\n\n%s: \n", label);
+	// Iterate over the main array.
+	for (int i = 0; i < stringArraysCount; i++)
 	{
-		destination++;
+		// For each sub-array, calculate the length of the label and allocate memory for it.
+		int subArrayLabelCharacterCount = string_length(label);
+		char* subArrayLabel = (char*)malloc((string_length(label) + 1) * sizeof(char));// = allocate_memory_char_ptr(strlen(label) + 1);
+
+		// Print each sub-array.
+		print_string_array(stringArrayArray[i], stringSubArraysCount, "stringArrayArray[i]");
 	}
 	
-	// Copy each character from source to destination, including the null terminator
-	while ((*destination++ = *source++));
-	
-	return dest_start; // Return the start of the destination buffer
+	printf("\n\n\n=========================================================================================\n\n");
 }
 
-
-
-
-
+/**
+ * print_array
+ * Prints the elements of a double array with a label.
+ *
+ * @param n Number of elements in the array.
+ * @param data Array of doubles to be printed.
+ * @param label Label to be printed before printing the array.
+ */
+void print_array(int n, double *data, char*label)
+{
+	// Check for NULL input and handle error.
+	if (data == NULL){ perror("\n\nError: data was NULL in 'print_array'.\n");      exit(1); }
+	printf("\n\n\n\n\n\n\n\n%s: \n", label);
+	// Loop through the characters print
+	for(int i = 0; i < n; i++)
+	{ printf("%.17g ", data[i]); } printf("\n\n\n");
+}
 
 
 /**
- * concatenate_n_character_string
+ * print_array_array
  *
- * Appends at most 'n' characters from the source string to the destination string,
- * and then appends a null terminator. The destination string must have enough space
- * to hold the resulting concatenated string.
+ * This function prints the contents of a 2D array with each element
+ * displayed to 17 decimal places. The output is formatted with a label and
+ * surrounded by a visual border for clarity.
  *
- * @param destination The destination string to which the source string will be concatenated.
- * @param source The source string to be concatenated.
- * @param n The maximum number of characters to concatenate from the source string.
- * @return A pointer to the destination string.
+ * @param data A pointer to a pointer of doubles representing a 2D array.
+ * @param rows The number of rows in the 2D array.
+ * @param columns The number of columns in each row.
+ * @param label A string label for the array.
  */
-char *concatenate_n_character_string(char *destination, const char *source, size_t n)
+void print_array_array(double **data, int rows, int columns, char*label)
 {
-	char *dest_start = destination; // Save the start of destination buffer
+	// Check for NULL input and handle error.
+	if (data == NULL){ perror("\n\nError: data was NULL in 'print_array_array'.\n");      exit(1); }
 	
-	// Move destination to the end of the current string
-	while (*destination)
+	printf("\n\n\n\n\n\n\nprint_array_array %s =========================================================================================", label);
+	printf("\n\n%s: \n", label);
+	
+	for (int i = 0; i < rows; i++)
 	{
-		destination++;
+		
+		for (int j = 0; j < columns; j++)
+		{
+			printf("%.17g ", data[i][j]);
+		}
+		printf("\n"); // Newline after each row
 	}
-	
-	// Copy up to 'n' characters from source to destination
-	while (n-- > 0 && *source)
-	{
-		*destination++ = *source++;
-	}
-	
-	// Null-terminate the destination string
-	*destination = '\0';
-	
-	return dest_start; // Return the start of the destination buffer
+	printf("\n\n=========================================================================================\n\n");
 }
+
+
+/**
+ * print_char_ptr_array
+ * Prints the elements of a string array.
+ *
+ * @param charPtrArr Array of strings to be printed.
+ * @param stringCount Number of strings in the array.
+ */
+void print_char_ptr_array(const char *charPtrArr[],  int stringCount, char* label)
+{
+	// Check for NULL input and handle error.
+	if (charPtrArr == NULL){ perror("\n\nError: charPtrArr was NULL in 'print_char_ptr_array'.\n");      exit(1); }
+	
+	
+	printf("\n\n%s: \n", label);
+	// Loop through the elements array and print
+	for (int i = 0; i < stringCount; i++)
+	{
+		printf("%s", charPtrArr[i]);
+	}
+	printf("\n\n\n");
+}
+
+
+
+
+
+
+
